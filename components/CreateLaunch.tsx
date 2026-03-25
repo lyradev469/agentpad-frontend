@@ -6,10 +6,13 @@ import { createPublicClient, http, parseAbi, zeroAddress } from 'viem'
 
 const AGENT_PAD_ADDRESS = '0xd5291AB2181dcD04CEF3039dA52ec4880aC642D4' as const
 
-// TIP-20 Token addresses on Tempo Moderato
+// TIP-20 Token addresses on Tempo (Mainnet & Testnet)
+// Source: https://docs.tempo.xyz/quickstart/predeployed-contracts
 const TIP20_TOKENS = {
-  pathUSD: '0x0000000000000000000000000000000000000001', // Replace with actual address
-  alphaUSD: '0x0000000000000000000000000000000000000002', // Replace with actual address
+  pathUSD: '0x20c0000000000000000000000000000000000000', // Predeployed stablecoin
+  alphaUSD: '0x20c0000000000000000000000000000000000001', // Alpha stablecoin
+  betaUSD: '0x20c0000000000000000000000000000000000002', // Beta stablecoin
+  thetaUSD: '0x20c0000000000000000000000000000000000003', // Theta stablecoin
 }
 
 const abi = parseAbi([
@@ -24,7 +27,7 @@ export function CreateLaunch() {
   const { isConnected, address } = useAccount()
   const { writeContract, isPending, error, data: hash } = useWriteContract()
   
-  const [token, setToken] = useState<'pathUSD' | 'alphaUSD'>('pathUSD')
+  const [token, setToken] = useState<'pathUSD' | 'alphaUSD' | 'betaUSD' | 'thetaUSD'>('pathUSD')
   const [target, setTarget] = useState('')
   const [min, setMin] = useState('')
   const [max, setMax] = useState('')
@@ -97,11 +100,13 @@ export function CreateLaunch() {
         </label>
         <select
           value={token}
-          onChange={(e) => setToken(e.target.value as 'pathUSD' | 'alphaUSD')}
+          onChange={(e) => setToken(e.target.value as 'pathUSD' | 'alphaUSD' | 'betaUSD' | 'thetaUSD')}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
-          <option value="pathUSD">pathUSD</option>
+          <option value="pathUSD">pathUSD (Primary)</option>
           <option value="alphaUSD">alphaUSD</option>
+          <option value="betaUSD">betaUSD</option>
+          <option value="thetaUSD">thetaUSD</option>
         </select>
         <p className="text-xs text-gray-500 mt-1">
           Select the stablecoin for this launch

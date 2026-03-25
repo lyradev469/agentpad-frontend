@@ -177,8 +177,7 @@ export function LaunchList() {
           </div>
         )
       })}
-    </div>
-
+      
       {selectedLaunch && (
         <ContributeModal
           launchId={selectedLaunch.id}
@@ -187,5 +186,6 @@ export function LaunchList() {
           onSuccess={() => window.location.reload()}
         />
       )}
+    </div>
   )
 }
