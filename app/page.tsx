@@ -7,6 +7,7 @@ import { RegisterAgent } from '@/components/RegisterAgent'
 import { FeeSponsorshipPanel } from '@/components/FeeSponsorshipPanel'
 import { DEXSwapModal } from '@/components/DEXSwapModal'
 import { MPPPayment } from '@/components/MPPPayment'
+import { HealthMonitor } from '@/components/HealthMonitor'
 import { useAccount } from 'wagmi'
 import { useState, useEffect } from 'react'
 
@@ -145,6 +146,9 @@ export default function Home() {
             onSuccess={() => setShowSwap(false)}
           />
         )}
+
+        {/* Health Monitor */}
+        <HealthMonitor />
 
         {/* Footer */}
         <footer className="mt-16 text-center text-gray-500">

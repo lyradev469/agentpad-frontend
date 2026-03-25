@@ -4,11 +4,13 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "env": {
-    "NEXT_PUBLIC_RPC_URL": "https://rpc.moderato.tempo.xyz",
-    "NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID": "tempo-wallet"
-  },
-  "regions": ["iad1"],
+  "regions": ["iad1", "sfo1"],
+  "crons": [
+    {
+      "path": "/api/health",
+      "schedule": "0 * * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -24,8 +26,58 @@
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "geolocation=(), microphone=(), camera=()"
+        }
+      ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     }
-  ]
+  ],
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/docs",
+      "destination": "https://docs.tempo.xyz"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/github",
+      "destination": "https://github.com/lyradev469/agentpad-frontend",
+      "permanent": true
+    },
+    {
+      "source": "/explorer",
+      "destination": "https://explore.tempo.xyz",
+      "permanent": true
+    },
+    {
+      "source": "/wallet",
+      "destination": "https://wallet.tempo.xyz",
+      "permanent": true
+    }
+  ],
+  "env": {
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  "framework": {
+    "version": "latest"
+  }
 }
