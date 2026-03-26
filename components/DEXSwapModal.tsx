@@ -31,8 +31,8 @@ export function DEXSwapModal({ fromToken, toToken, amount, onClose, onSuccess }:
     if (!isConnected || !address || !amount) return
 
     try {
-      // Construct swap path (in Tempo's format)
-      const path = [fromToken, toToken]
+      // Construct swap path (in Tempo's format) - cast to proper type
+      const path = [fromToken, toToken] as readonly (`0x${string}`)[]
       const amountIn = BigInt(parseFloat(amount) * 1e18)
       const minAmountOut = BigInt(parseFloat(amount) * 1e18 * (1 - parseFloat(slippage) / 100))
 
@@ -40,7 +40,7 @@ export function DEXSwapModal({ fromToken, toToken, amount, onClose, onSuccess }:
         address: DEX_ADDRESS as `0x${string}`,
         abi: DEX_ABI,
         functionName: 'swapExactAmountsIn',
-        args: [path, [amountIn], minAmountOut],
+        args: [path, [amountIn], minAmountOut] as const,
       })
 
       setTimeout(() => {
