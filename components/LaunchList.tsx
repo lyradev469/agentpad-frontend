@@ -21,24 +21,26 @@ interface Launch {
   id: number
   agent: `0x${string}`
   tip20Token: `0x${string}`
-  targetAmount: bigint
-  minContribution: bigint
-  maxContribution: bigint
-  raisedAmount: bigint
-  vestingPeriod: bigint
-  deadline: bigint
+  targetAmount: string  // Changed from bigint to string for serialization
+  minContribution: string
+  maxContribution: string
+  raisedAmount: string
+  vestingPeriod: string
+  deadline: string
   active: boolean
   claimed: boolean
-  contributionCount: bigint
+  contributionCount: string
 }
 
-function formatAmount(amount: bigint): string {
-  return (Number(amount) / 1e18).toFixed(2)
+function formatAmount(amount: string): string {
+  return (BigInt(amount) / BigInt(1e18)).toString()
 }
 
-function getProgress(amount: bigint, target: bigint): number {
-  if (target === BigInt(0)) return 0
-  return Math.min(100, Math.round((Number(amount) / Number(target)) * 100))
+function getProgress(amount: string, target: string): number {
+  if (target === '0') return 0
+  const amt = BigInt(amount)
+  const tgt = BigInt(target)
+  return Math.min(100, Math.round(Number((amt * 100n) / tgt)))
 }
 
 export function LaunchList() {
