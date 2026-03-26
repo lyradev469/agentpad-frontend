@@ -11,19 +11,17 @@ import { MPPPayment } from '@/components/MPPPayment'
 import HealthMonitor from '@/components/HealthMonitor'
 import { useAccount } from 'wagmi'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Rocket, TrendingUp, ArrowUpRight, Activity, Shield, Zap, DollarSign } from 'lucide-react'
+import { Zap, Shield, DollarSign, ArrowUpRight, TrendingUp, Rocket } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
-// Disable static generation
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-// Add premium fonts
 if (typeof window !== 'undefined') {
   const clashLink = document.createElement('link')
-  clashLink.href = 'https://api.fontshare.com/v2/css?f[]=clash-display@200,400,500,600,700&f[]=general-sans@200,300,400,500,600&display=swap'
+  clashLink.href = 'https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap'
   clashLink.rel = 'stylesheet'
   document.head.appendChild(clashLink)
 }
@@ -61,74 +59,66 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-[#fafafa] selection:bg-amber-400/30">
-      {/* Premium texture overlay */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div 
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 20% 50%, rgba(251,191,36,0.05) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(139,92,246,0.05) 0%, transparent 50%),
-              radial-gradient(circle at 40% 80%, rgba(59,130,246,0.05) 0%, transparent 50%)
-            `,
-          }}
-        />
-      </div>
+    <div className="min-h-screen bg-white text-black font-sans">
+      {/* Header - Brutalist Minimal */}
+      <header className="border-b border-black py-8 px-6 md:px-12">
+        <div className="container-simple">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Badge className="badge-mono mb-6">Tempo Mainnet Live</Badge>
+          </motion.div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Premium Header */}
-        <motion.header 
-          className="mb-16 text-center"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/10 mb-8 backdrop-blur-sm">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            <span className="text-sm text-gray-400 font-medium">Tempo Mainnet Live</span>
-          </div>
-          
-          <h1 className="font-display text-5xl md:text-7xl font-medium tracking-tight mb-6">
-            <span className="text-white">Agent</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-violet-400 to-blue-400">
-              {' '}Pad
-            </span>
-          </h1>
-          
-          <p className="text-gray-400 text-lg md:text-xl max-w-3xl mx-auto mb-8 leading-relaxed">
-            Launch your token in minutes. Zero gas fees for contributors, 
-            multi-stablecoin funding, and instant global settlement on Tempo.
-          </p>
+          <motion.h1
+            className="text-macro mb-6 tracking-macro"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            agent<span className="text-gray-400">pad</span>
+          </motion.h1>
+
+          <motion.p
+            className="text-micro max-w-[600px] mb-8 tracking-micro"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Launch your token in minutes. Zero gas fees for contributors, multi-stablecoin funding.
+          </motion.p>
 
           {!isConnected && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
             >
-              <p className="text-sm text-gray-500 mb-4 flex items-center justify-center gap-2">
-                <Zap className="h-4 w-4 text-amber-400" />
-                Connect your Tempo wallet to launch a token
+              <p className="text-sm text-gray-500 flex items-center gap-2">
+                <Rocket className="h-4 w-4" />
+                Connect wallet to launch
               </p>
             </motion.div>
           )}
-        </motion.header>
+        </div>
+      </header>
 
+      <div className="container-simple px-6 md:px-12 py-12">
         <WalletConnect />
 
-        {/* Fee Sponsorship Panel */}
+        {/* Fee Sponsorship */}
         <AnimatePresence>
           {isConnected && showSponsorship && (
-            <motion.section 
-              className="mb-8"
+            <motion.section
+              className="mb-12"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-white/[0.02] border border-white/5 backdrop-blur-sm">
-                <CardContent className="p-6">
+              <Card className="card-brutalist-dark">
+                <CardContent className="p-0">
                   <FeeSponsorshipPanel onSponsorshipEnabled={handleFeeSponsorshipEnabled} />
                 </CardContent>
               </Card>
@@ -136,22 +126,20 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* Project Registration (was Agent Registration) */}
+        {/* Project Registration */}
         <AnimatePresence>
           {isConnected && !isAgent && (
-            <motion.section 
-              className="mb-8"
+            <motion.section
+              className="mb-12"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-white/[0.02] border border-white/5 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-display font-medium mb-4">Register Your Project</h3>
-                  <p className="text-gray-400 mb-4">
-                    Create your project identity on Tempo to launch tokens and build community.
-                  </p>
+              <Card className="card-brutalist">
+                <CardContent className="p-0">
+                  <h3 className="text-2xl font-semibold mb-2">Register Project</h3>
+                  <p className="text-gray-600 mb-6">Create your identity on Tempo to launch tokens.</p>
                   <RegisterAgent onSuccess={handleProjectRegistered} />
                 </CardContent>
               </Card>
@@ -159,100 +147,88 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* Control Center Dashboard */}
+        {/* Control Center */}
         {isAgent === true && isConnected && (
-          <motion.div 
+          <motion.div
             className="mb-16"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h2 className="font-display text-2xl font-medium mb-8 text-white flex items-center gap-3">
-              <span className="w-1 h-6 rounded-full bg-gradient-to-b from-amber-400 to-violet-500"></span>
-              Control Center
-            </h2>
+            <h2 className="text-micro mb-8 tracking-micro">Control Center</h2>
             
-            <div className="grid md:grid-cols-3 gap-6">
-              <motion.div whileHover={{ y: -4, scale: 1.01 }} transition={{ duration: 0.2 }}>
-                <Button 
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+              <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+                <Button
                   onClick={() => setShowSponsorship(!showSponsorship)}
-                  className="w-full h-44 flex flex-col items-center justify-center gap-4 relative overflow-hidden group bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-amber-500/30 transition-all duration-500"
+                  className="w-full h-40 flex flex-col items-start justify-start p-6 bg-white border-2 border-black hover:bg-gray-50 transition-all duration-200 rounded-none"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <Zap className="h-10 w-10 text-amber-400 relative z-10" />
-                  <div className="text-center relative z-10">
-                    <div className="font-display font-medium text-lg text-white">Fee Sponsorship</div>
-                    <div className="text-xs text-gray-500 mt-1">Enable zero-gas for contributors</div>
+                  <div className="flex items-center justify-between w-full mb-4">
+                    <Zap className="h-8 w-8" />
+                    <ArrowUpRight className="h-5 w-5 text-gray-500" />
                   </div>
-                  <ArrowUpRight className="absolute top-4 right-4 h-5 w-5 text-gray-600 group-hover:text-amber-400 transition-colors" />
+                  <div className="text-lg font-semibold">Fee Sponsorship</div>
+                  <div className="text-sm text-gray-600">Zero-gas for users</div>
                 </Button>
               </motion.div>
 
-              <motion.div whileHover={{ y: -4, scale: 1.01 }} transition={{ duration: 0.2 }}>
-                <Button 
+              <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+                <Button
                   onClick={() => setShowSwap(true)}
-                  className="w-full h-44 flex flex-col items-center justify-center gap-4 relative overflow-hidden group bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-blue-500/30 transition-all duration-500"
+                  className="w-full h-40 flex flex-col items-start justify-start p-6 bg-white border-2 border-black hover:bg-gray-50 transition-all duration-200 rounded-none"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <DollarSign className="h-10 w-10 text-blue-400 relative z-10" />
-                  <div className="text-center relative z-10">
-                    <div className="font-display font-medium text-lg text-white">Token Swap</div>
-                    <div className="text-xs text-gray-500 mt-1">Convert stablecoins</div>
+                  <div className="flex items-center justify-between w-full mb-4">
+                    <DollarSign className="h-8 w-8" />
+                    <ArrowUpRight className="h-5 w-5 text-gray-500" />
                   </div>
-                  <ArrowUpRight className="absolute top-4 right-4 h-5 w-5 text-gray-600 group-hover:text-blue-400 transition-colors" />
+                  <div className="text-lg font-semibold">Token Swap</div>
+                  <div className="text-sm text-gray-600">Convert stablecoins</div>
                 </Button>
               </motion.div>
 
-              <motion.div whileHover={{ y: -4, scale: 1.01 }} transition={{ duration: 0.2 }}>
-                <Button 
+              <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+                <Button
                   onClick={() => alert('MPP payments coming soon!')}
-                  className="w-full h-44 flex flex-col items-center justify-center gap-4 relative overflow-hidden group bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-violet-500/30 transition-all duration-500"
+                  className="w-full h-40 flex flex-col items-start justify-start p-6 bg-white border-2 border-black hover:bg-gray-50 transition-all duration-200 rounded-none"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <Activity className="h-10 w-10 text-violet-400 relative z-10" />
-                  <div className="text-center relative z-10">
-                    <div className="font-display font-medium text-lg text-white">MPP Payments</div>
-                    <div className="text-xs text-gray-500 mt-1">Multi-token payouts</div>
+                  <div className="flex items-center justify-between w-full mb-4">
+                    <Shield className="h-8 w-8" />
+                    <ArrowUpRight className="h-5 w-5 text-gray-500" />
                   </div>
-                  <ArrowUpRight className="absolute top-4 right-4 h-5 w-5 text-gray-600 group-hover:text-violet-400 transition-colors" />
+                  <div className="text-lg font-semibold">MPP Payments</div>
+                  <div className="text-sm text-gray-600">Multi-token payouts</div>
                 </Button>
               </motion.div>
             </div>
           </motion.div>
         )}
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        {/* Main Content - Grid */}
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12">
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="card-brutalist"
           >
-            <h2 className="font-display text-2xl font-medium mb-6 text-white flex items-center gap-3">
-              <span className="w-1 h-6 rounded-full bg-gradient-to-b from-blue-400 to-cyan-500"></span>
-              Launch Token
-            </h2>
-            <Card className="bg-white/[0.02] border border-white/5 backdrop-blur-sm hover:border-white/10 transition-colors duration-300">
-              <CardContent className="p-6">
-                <CreateLaunch />
-              </CardContent>
-            </Card>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">Create Launch</h2>
+              <div className="w-1 h-6 bg-black" />
+            </div>
+            <CreateLaunch />
           </motion.section>
 
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
+            className="card-brutalist"
           >
-            <h2 className="font-display text-2xl font-medium mb-6 text-white flex items-center gap-3">
-              <span className="w-1 h-6 rounded-full bg-gradient-to-b from-violet-400 to-purple-500"></span>
-              Active Launches
-            </h2>
-            <Card className="bg-white/[0.02] border border-white/5 backdrop-blur-sm hover:border-white/10 transition-colors duration-300">
-              <CardContent className="p-6">
-                <LaunchList />
-              </CardContent>
-            </Card>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">Active Launches</h2>
+              <div className="w-1 h-6 bg-black" />
+            </div>
+            <LaunchList />
           </motion.section>
         </div>
 
@@ -263,7 +239,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
+              className="fixed inset-0 bg-white/90 flex items-center justify-center z-[100] p-4 backdrop-blur-sm"
             >
               <DEXSwapModal
                 fromToken={swapData.from}
@@ -279,39 +255,29 @@ export default function Home() {
         {/* Health Monitor */}
         <HealthMonitor />
 
-        {/* Premium Footer */}
-        <motion.footer 
-          className="mt-24 text-center text-gray-600"
+        {/* Footer */}
+        <motion.footer
+          className="mt-24 py-12 border-t border-black"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
           <div className="flex justify-center items-center gap-2 mb-4">
-            <span className="w-1 h-1 rounded-full bg-amber-400"></span>
-            <p className="text-sm">
-              Token Launchpad on <span className="text-amber-400 font-medium">Tempo Network</span> by <span className="text-violet-400 font-medium">Lyrantic</span>
-            </p>
-            <span className="w-1 h-1 rounded-full bg-violet-400"></span>
+            <span className="text-sm">agentpad / tempo / open source</span>
           </div>
-          <div className="flex justify-center gap-6 text-xs">
-            <a href="https://docs.tempo.xyz" className="hover:text-amber-400 transition-colors">Tempo Docs</a>
-            <a href="https://explore.tempo.xyz" className="hover:text-amber-400 transition-colors">Explorer</a>
-            <a href="https://wallet.tempo.xyz" className="hover:text-amber-400 transition-colors">Wallet</a>
-            <a href="/landing" className="hover:text-amber-400 transition-colors">Landing Page</a>
-            <a href="https://github.com/lyradev469" className="hover:text-amber-400 transition-colors">GitHub</a>
+          <div className="flex justify-center gap-6 text-xs text-gray-600">
+            <a href="https://docs.tempo.xyz" className="hover:text-black">Docs</a>
+            <span>/</span>
+            <a href="https://explore.tempo.xyz" className="hover:text-black">Explorer</a>
+            <span>/</span>
+            <a href="https://wallet.tempo.xyz" className="hover:text-black">Wallet</a>
+            <span>/</span>
+            <a href="/landing" className="hover:text-black">Landing</a>
+            <span>/</span>
+            <a href="https://github.com/lyradev469" className="hover:text-black">GitHub</a>
           </div>
         </motion.footer>
       </div>
-
-      {/* Global styles */}
-      <style jsx global>{`
-        .font-display { font-family: 'Clash Display', sans-serif; }
-        :root {
-          --neon-green: #00ff88;
-          --neon-blue: #00ccff;
-          --copper: #b87333;
-        }
-      `}</style>
     </div>
   )
 }

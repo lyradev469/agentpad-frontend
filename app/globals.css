@@ -2,26 +2,130 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
+/* ============================================
+   HERE.NOW INSPIRED THEME - Minimal Brutalist
+   ============================================ */
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
+    --border: 0 0% 90%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer components {
+  /* Typography - Massive, bold, clean */
+  .text-macro {
+    @apply text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter leading-[0.9];
+  }
+
+  .text-micro {
+    @apply text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight leading-[1.1];
+  }
+
+  .text-code {
+    @apply font-mono text-sm;
+  }
+
+  /* Layout */
+  .container-simple {
+    @apply max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16;
+  }
+
+  .section-spacer {
+    @apply py-24 md:py-32 lg:py-40;
+  }
+
+  /* Cards - Minimal borders, no shadows */
+  .card-brutalist {
+    @apply border-2 border-black bg-white p-6 md:p-8 transition-all duration-200 hover:border-gray-300;
+  }
+
+  .card-brutalist-dark {
+    @apply border-2 border-black bg-gray-50 p-6 md:p-8;
+  }
+
+  /* Buttons - Sharp corners, high contrast */
+  .btn-primary {
+    @apply bg-black text-white px-6 py-3 text-base font-semibold border-2 border-black 
+           hover:bg-white hover:text-black hover:border-black transition-all duration-200 
+           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed rounded-none;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-black px-6 py-3 text-base font-semibold border-2 border-black 
+           hover:bg-gray-50 transition-all duration-200 active:scale-[0.98] rounded-none;
+  }
+
+  /* Inputs - Terminal style */
+  .input-terminal {
+    @apply w-full px-4 py-3 text-base font-mono bg-white border-2 border-black 
+           focus:outline-none focus:ring-0 focus:border-gray-500 
+           placeholder-gray-400 transition-all duration-200 rounded-none;
+  }
+
+  /* Grid - Simple spacing */
+  .grid-simple {
+    @apply grid gap-6 md:gap-8 lg:gap-12;
+  }
+
+  /* Divider - Minimal */
+  .divider-simple {
+    @apply h-px bg-black/10 my-12 md:my-16;
+  }
+
+  /* Badge - Monospace */
+  .badge-mono {
+    @apply inline-block px-3 py-1 text-xs font-mono border border-black bg-white 
+           uppercase tracking-widest rounded-none;
+  }
+
+  /* Animations - Subtle */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer utilities {
+  .tracking-macro {
+    letter-spacing: -0.05em;
+  }
+
+  .tracking-micro {
+    letter-spacing: -0.02em;
+  }
 }
