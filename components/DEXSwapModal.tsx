@@ -95,7 +95,7 @@ export function DEXSwapModal({ fromToken, toToken, amount, onClose, onSuccess }:
               <span className="text-sm font-medium">{toToken}</span>
             </div>
             <div className="text-2xl font-bold">{quote || amount}</div>
-            {quote !== amount && (
+            {quote && quote !== amount && (
               <div className="text-xs text-green-600 mt-1">
                 Rate: 1 {fromToken} ≈ {(parseFloat(quote) / parseFloat(amount)).toFixed(4)} {toToken}
               </div>
