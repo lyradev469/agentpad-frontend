@@ -1,13 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextResponse } from 'next/server'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
-
+export async function GET() {
   try {
     const response = await fetch('https://rpc.moderato.tempo.xyz', {
       method: 'POST',
@@ -18,7 +11,6 @@ export default async function handler(
         method: 'eth_blockNumber',
         params: [],
       }),
-      timeout: 5000,
     })
 
     const data = await response.json()
@@ -27,19 +19,18 @@ export default async function handler(
       const blockNumber = parseInt(data.result, 16)
       const timestamp = Date.now()
 
-      return res.status(200).json({
+      return NextResponse.json({
         status: 'healthy',
         blockNumber,
         timestamp,
-        latency: timestamp % 1000, // Just a simple indicator
       })
     }
 
-    return res.status(500).json({ status: 'unknown', error: 'No block number' })
+    return NextResponse.json({ status: 'unknown', error: 'No block number' }, { status: 500 })
   } catch (error) {
-    return res.status(503).json({ 
+    return NextResponse.json({ 
       status: 'unhealthy', 
       error: error instanceof Error ? error.message : 'Unknown error' 
-    })
+    }, { status: 503 })
   }
 }
