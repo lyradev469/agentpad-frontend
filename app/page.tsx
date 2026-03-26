@@ -11,6 +11,10 @@ import HealthMonitor from '@/components/HealthMonitor'
 import { useAccount } from 'wagmi'
 import { useState, useEffect, useCallback } from 'react'
 
+// Disable static generation - this app needs client-side rendering
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function Home() {
   const { isConnected, address } = useAccount()
   const [isAgent, setIsAgent] = useState<boolean | null>(null)
