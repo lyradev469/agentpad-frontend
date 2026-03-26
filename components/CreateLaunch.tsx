@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useWriteContract, useAccount } from 'wagmi'
-import { createPublicClient, http, parseAbi, zeroAddress } from 'viem'
+import { parseAbi } from 'viem'
 
 const AGENT_PAD_ADDRESS = '0xd5291AB2181dcD04CEF3039dA52ec4880aC642D4' as const
 
@@ -18,10 +18,6 @@ const TIP20_TOKENS = {
 const abi = parseAbi([
   'function createLaunch(address tip20Token, uint256 targetAmount, uint256 minContribution, uint256 maxContribution, uint256 vestingPeriod, uint256 durationSeconds) returns (uint256)',
 ])
-
-const client = createPublicClient({
-  transport: http('https://rpc.moderato.tempo.xyz'),
-})
 
 export function CreateLaunch() {
   const { isConnected, address } = useAccount()

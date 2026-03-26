@@ -6,10 +6,8 @@ import { ContributeModal } from './ContributeModal'
 
 const AGENT_PAD_ADDRESS = '0xd5291AB2181dcD04CEF3039dA52ec4880aC642D4' as const
 
-// Simple client for reading contract data
-const client = createPublicClient({
-  transport: http('https://rpc.moderato.tempo.xyz'),
-})
+// Simple client for reading contract data - MOVED inside useEffect to avoid module-level creation
+const RPC_URL = 'https://rpc.moderato.tempo.xyz'
 
 const abi = parseAbi([
   'function launchCount() view returns (uint256)',
@@ -57,6 +55,11 @@ export function LaunchList() {
   }, [])
 
   useEffect(() => {
+    // Create client INSIDE useEffect (not at module level)
+    const client = createPublicClient({
+      transport: http(RPC_URL),
+    })
+
     const fetchCount = async () => {
       try {
         setLoadingCount(true)
@@ -77,6 +80,11 @@ export function LaunchList() {
 
   useEffect(() => {
     if (!totalCount || loadingCount) return
+
+    // Create client INSIDE useEffect (not at module level)
+    const client = createPublicClient({
+      transport: http(RPC_URL),
+    })
 
     const fetchLaunches = async () => {
       setLoading(true)
