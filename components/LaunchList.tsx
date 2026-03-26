@@ -94,17 +94,17 @@ export function LaunchList() {
           if (data && data[8]) { // active = true
             activeLaunches.push({
               id: i,
-              agent: data[0],
-              tip20Token: data[1],
-              targetAmount: data[2],
-              minContribution: data[3],
-              maxContribution: data[4],
-              raisedAmount: data[5],
-              vestingPeriod: data[6],
-              deadline: data[7],
-              active: data[8],
-              claimed: data[9],
-              contributionCount: data[10],
+              agent: data[0] as `0x${string}`,
+              tip20Token: data[1] as `0x${string}`,
+              targetAmount: data[2].toString(),
+              minContribution: data[3].toString(),
+              maxContribution: data[4].toString(),
+              raisedAmount: data[5].toString(),
+              vestingPeriod: data[6].toString(),
+              deadline: data[7].toString(),
+              active: data[8] as boolean,
+              claimed: data[9] as boolean,
+              contributionCount: data[10].toString(),
             })
           }
         } catch (error) {
