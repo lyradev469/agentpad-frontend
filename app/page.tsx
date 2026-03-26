@@ -11,7 +11,7 @@ import { MPPPayment } from '@/components/MPPPayment'
 import HealthMonitor from '@/components/HealthMonitor'
 import { useAccount } from 'wagmi'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Zap, Shield, Brain, ArrowRight, Rocket, TrendingUp, ArrowUpRight, Activity, Globe, Sparkles } from 'lucide-react'
+import { Rocket, TrendingUp, ArrowUpRight, Activity, Shield, Zap, DollarSign } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -49,7 +49,7 @@ export default function Home() {
     }
   }, [isConnected, address])
 
-  const handleAgentRegistered = (agentId: number) => {
+  const handleProjectRegistered = (projectId: number) => {
     setIsAgent(true)
     if (address) {
       localStorage.setItem(`agent-${address}`, 'true')
@@ -86,7 +86,7 @@ export default function Home() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/10 mb-8 backdrop-blur-sm">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            <span className="text-sm text-gray-400 font-medium">Tempo Mainnet Ready</span>
+            <span className="text-sm text-gray-400 font-medium">Tempo Mainnet Live</span>
           </div>
           
           <h1 className="font-display text-5xl md:text-7xl font-medium tracking-tight mb-6">
@@ -97,8 +97,8 @@ export default function Home() {
           </h1>
           
           <p className="text-gray-400 text-lg md:text-xl max-w-3xl mx-auto mb-8 leading-relaxed">
-            Launch autonomous agents with zero gas fees, machine payments, and onchain reputation. 
-            Built on Tempo's payment lane architecture.
+            Launch your token in minutes. Zero gas fees for contributors, 
+            multi-stablecoin funding, and instant global settlement on Tempo.
           </p>
 
           {!isConnected && (
@@ -108,8 +108,8 @@ export default function Home() {
               transition={{ delay: 0.3 }}
             >
               <p className="text-sm text-gray-500 mb-4 flex items-center justify-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-400" />
-                Connect your Tempo wallet to get started
+                <Zap className="h-4 w-4 text-amber-400" />
+                Connect your Tempo wallet to launch a token
               </p>
             </motion.div>
           )}
@@ -117,7 +117,7 @@ export default function Home() {
 
         <WalletConnect />
 
-        {/* Advanced Features Panel */}
+        {/* Fee Sponsorship Panel */}
         <AnimatePresence>
           {isConnected && showSponsorship && (
             <motion.section 
@@ -136,7 +136,7 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* Agent Registration */}
+        {/* Project Registration (was Agent Registration) */}
         <AnimatePresence>
           {isConnected && !isAgent && (
             <motion.section 
@@ -148,14 +148,18 @@ export default function Home() {
             >
               <Card className="bg-white/[0.02] border border-white/5 backdrop-blur-sm">
                 <CardContent className="p-6">
-                  <RegisterAgent onSuccess={handleAgentRegistered} />
+                  <h3 className="text-xl font-display font-medium mb-4">Register Your Project</h3>
+                  <p className="text-gray-400 mb-4">
+                    Create your project identity on Tempo to launch tokens and build community.
+                  </p>
+                  <RegisterAgent onSuccess={handleProjectRegistered} />
                 </CardContent>
               </Card>
             </motion.section>
           )}
         </AnimatePresence>
 
-        {/* Premium Dashboard */}
+        {/* Control Center Dashboard */}
         {isAgent === true && isConnected && (
           <motion.div 
             className="mb-16"
@@ -178,7 +182,7 @@ export default function Home() {
                   <Zap className="h-10 w-10 text-amber-400 relative z-10" />
                   <div className="text-center relative z-10">
                     <div className="font-display font-medium text-lg text-white">Fee Sponsorship</div>
-                    <div className="text-xs text-gray-500 mt-1">Zero-gas experience for users</div>
+                    <div className="text-xs text-gray-500 mt-1">Enable zero-gas for contributors</div>
                   </div>
                   <ArrowUpRight className="absolute top-4 right-4 h-5 w-5 text-gray-600 group-hover:text-amber-400 transition-colors" />
                 </Button>
@@ -190,10 +194,10 @@ export default function Home() {
                   className="w-full h-44 flex flex-col items-center justify-center gap-4 relative overflow-hidden group bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-blue-500/30 transition-all duration-500"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <TrendingUp className="h-10 w-10 text-blue-400 relative z-10" />
+                  <DollarSign className="h-10 w-10 text-blue-400 relative z-10" />
                   <div className="text-center relative z-10">
-                    <div className="font-display font-medium text-lg text-white">DEX Swap</div>
-                    <div className="text-xs text-gray-500 mt-1">Enshrined liquidity pools</div>
+                    <div className="font-display font-medium text-lg text-white">Token Swap</div>
+                    <div className="text-xs text-gray-500 mt-1">Convert stablecoins</div>
                   </div>
                   <ArrowUpRight className="absolute top-4 right-4 h-5 w-5 text-gray-600 group-hover:text-blue-400 transition-colors" />
                 </Button>
@@ -205,10 +209,10 @@ export default function Home() {
                   className="w-full h-44 flex flex-col items-center justify-center gap-4 relative overflow-hidden group bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-violet-500/30 transition-all duration-500"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <Brain className="h-10 w-10 text-violet-400 relative z-10" />
+                  <Activity className="h-10 w-10 text-violet-400 relative z-10" />
                   <div className="text-center relative z-10">
                     <div className="font-display font-medium text-lg text-white">MPP Payments</div>
-                    <div className="text-xs text-gray-500 mt-1">Machine-to-machine transfers</div>
+                    <div className="text-xs text-gray-500 mt-1">Multi-token payouts</div>
                   </div>
                   <ArrowUpRight className="absolute top-4 right-4 h-5 w-5 text-gray-600 group-hover:text-violet-400 transition-colors" />
                 </Button>
@@ -217,7 +221,7 @@ export default function Home() {
           </motion.div>
         )}
 
-        {/* Main Content Grid - Premium cards */}
+        {/* Main Content Grid */}
         <div className="grid lg:grid-cols-2 gap-8">
           <motion.section
             initial={{ opacity: 0, y: 20 }}
@@ -226,7 +230,7 @@ export default function Home() {
           >
             <h2 className="font-display text-2xl font-medium mb-6 text-white flex items-center gap-3">
               <span className="w-1 h-6 rounded-full bg-gradient-to-b from-blue-400 to-cyan-500"></span>
-              Create Launch
+              Launch Token
             </h2>
             <Card className="bg-white/[0.02] border border-white/5 backdrop-blur-sm hover:border-white/10 transition-colors duration-300">
               <CardContent className="p-6">
@@ -242,7 +246,7 @@ export default function Home() {
           >
             <h2 className="font-display text-2xl font-medium mb-6 text-white flex items-center gap-3">
               <span className="w-1 h-6 rounded-full bg-gradient-to-b from-violet-400 to-purple-500"></span>
-              Active Missions
+              Active Launches
             </h2>
             <Card className="bg-white/[0.02] border border-white/5 backdrop-blur-sm hover:border-white/10 transition-colors duration-300">
               <CardContent className="p-6">
@@ -285,26 +289,16 @@ export default function Home() {
           <div className="flex justify-center items-center gap-2 mb-4">
             <span className="w-1 h-1 rounded-full bg-amber-400"></span>
             <p className="text-sm">
-              Built for <span className="text-amber-400 font-medium">Tempo</span> by <span className="text-violet-400 font-medium">Lyrantic</span>
+              Token Launchpad on <span className="text-amber-400 font-medium">Tempo Network</span> by <span className="text-violet-400 font-medium">Lyrantic</span>
             </p>
             <span className="w-1 h-1 rounded-full bg-violet-400"></span>
           </div>
           <div className="flex justify-center gap-6 text-xs">
-            <a href="https://docs.tempo.xyz" className="hover:text-amber-400 transition-colors">
-              Documentation
-            </a>
-            <a href="https://explore.tempo.xyz" className="hover:text-amber-400 transition-colors">
-              Explorer
-            </a>
-            <a href="https://wallet.tempo.xyz" className="hover:text-amber-400 transition-colors">
-              Wallet
-            </a>
-            <a href="/landing" className="hover:text-amber-400 transition-colors">
-              Landing Page
-            </a>
-            <a href="https://github.com/lyradev469" className="hover:text-amber-400 transition-colors">
-              GitHub
-            </a>
+            <a href="https://docs.tempo.xyz" className="hover:text-amber-400 transition-colors">Tempo Docs</a>
+            <a href="https://explore.tempo.xyz" className="hover:text-amber-400 transition-colors">Explorer</a>
+            <a href="https://wallet.tempo.xyz" className="hover:text-amber-400 transition-colors">Wallet</a>
+            <a href="/landing" className="hover:text-amber-400 transition-colors">Landing Page</a>
+            <a href="https://github.com/lyradev469" className="hover:text-amber-400 transition-colors">GitHub</a>
           </div>
         </motion.footer>
       </div>
