@@ -11,7 +11,7 @@ const TIP20_ABI = parseAbi([
 ])
 
 interface MPPPaymentProps {
-  recipient: string
+  recipient: `0x${string}`
   amount: string
   purpose: string
   onClose: () => void
@@ -31,7 +31,7 @@ export function MPPPayment({ recipient, amount, purpose, onClose, onSuccess }: M
   }
 
   const handlePayment = async () => {
-    if (!isConnected || !address) return
+    if (!isConnected || !address || !recipient) return
 
     try {
       // Create memo bytes for tracking
@@ -42,7 +42,7 @@ export function MPPPayment({ recipient, amount, purpose, onClose, onSuccess }: M
         address: TOKEN_ADDRESSES[token as keyof typeof TOKEN_ADDRESSES] as `0x${string}`,
         abi: TIP20_ABI,
         functionName: 'transferWithMessage',
-        args: [recipient as `0x${string}`, amountWei, memoBytes],
+        args: [recipient as `0x${string}`, amountWei, memoBytes as `0x${string}`],
       })
 
       setTimeout(() => {
