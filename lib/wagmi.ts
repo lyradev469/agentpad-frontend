@@ -1,6 +1,6 @@
 import { http, createConfig } from 'wagmi'
 import { mainnet, base } from 'wagmi/chains'
-import { coinbaseWallet, injected, metaMask, walletConnect } from 'wagmi/connectors'
+import { coinbaseWallet, injected, metaMask } from 'wagmi/connectors'
 
 // Tempo chains configuration
 const tempoTestnet = {
@@ -20,11 +20,9 @@ export const config = createConfig({
   chains: [tempoTestnet, base, mainnet],
   connectors: [
     injected({ target: 'metaMask' }),
-    walletConnect({ 
-      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'tempo-wallet' 
-    }),
     metaMask(),
     coinbaseWallet(),
+    // WalletConnect disabled until we have a valid project ID (avoids 403 timeout)
   ],
   transports: {
     [tempoTestnet.id]: http('https://rpc.moderato.tempo.xyz'),
