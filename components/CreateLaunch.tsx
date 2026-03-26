@@ -34,7 +34,7 @@ export function CreateLaunch() {
   const [duration, setDuration] = useState('7')
   const [vesting, setVesting] = useState('30')
 
-  const selectedTokenAddress = TIP20_TOKENS[token]
+  const selectedTokenAddress: `0x${string}` = TIP20_TOKENS[token] as `0x${string}`
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
