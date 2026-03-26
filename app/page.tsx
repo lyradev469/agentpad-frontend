@@ -7,7 +7,7 @@ import { RegisterAgent } from '@/components/RegisterAgent'
 import { FeeSponsorshipPanel } from '@/components/FeeSponsorshipPanel'
 import { DEXSwapModal } from '@/components/DEXSwapModal'
 import { MPPPayment } from '@/components/MPPPayment'
-import { HealthMonitor } from '@/components/HealthMonitor'
+import HealthMonitor from '@/components/HealthMonitor'
 import { useAccount } from 'wagmi'
 import { useState, useEffect } from 'react'
 
