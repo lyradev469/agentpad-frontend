@@ -6,16 +6,17 @@ import { createPublicClient, http } from 'viem'
 
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.moderato.tempo.xyz'
 
-const client = createPublicClient({
-  transport: http(RPC_URL),
-})
-
 export default function HealthCheck() {
   const { isConnected } = useAccount()
   const [status, setStatus] = useState<'checking' | 'healthy' | 'unhealthy'>('checking')
   const [latency, setLatency] = useState(0)
 
   useEffect(() => {
+    // Create client INSIDE useEffect (not at module level) to avoid serialization errors
+    const client = createPublicClient({
+      transport: http(RPC_URL),
+    })
+
     const checkHealth = async () => {
       try {
         const start = Date.now()
@@ -30,8 +31,8 @@ export default function HealthCheck() {
       }
     }
 
-    const interval = setInterval(checkHealth, 30000)
     checkHealth()
+    const interval = setInterval(checkHealth, 30000)
 
     return () => clearInterval(interval)
   }, [])
