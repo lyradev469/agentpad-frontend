@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { useReadContract } from 'wagmi'
 import { createPublicClient, http, parseAbi } from 'viem'
 import { ContributeModal } from './ContributeModal'
 
@@ -44,12 +43,9 @@ function getProgress(amount: string, target: string): number {
 }
 
 export function LaunchList() {
-  const { data: totalCount, isLoading: loadingCount } = useReadContract({
-    address: AGENT_PAD_ADDRESS,
-    abi,
-    functionName: 'launchCount',
-  } as const)
-
+  // Use only custom client for reading (skip useReadContract to avoid serialization issues)
+  const [totalCount, setTotalCount] = useState<bigint | null>(null)
+  const [loadingCount, setLoadingCount] = useState(true)
   const [launches, setLaunches] = useState<Launch[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedLaunch, setSelectedLaunch] = useState<Launch | null>(null)
@@ -58,6 +54,25 @@ export function LaunchList() {
   const handleCloseModal = useCallback(() => setSelectedLaunch(null), [])
   const handleSuccessModal = useCallback(() => {
     window.location.reload()
+  }, [])
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        setLoadingCount(true)
+        const count = await client.readContract({
+          address: AGENT_PAD_ADDRESS,
+          abi,
+          functionName: 'launchCount',
+        })
+        setTotalCount(count as bigint)
+      } catch (error) {
+        console.error('Failed to fetch launch count:', error)
+      } finally {
+        setLoadingCount(false)
+      }
+    }
+    fetchCount()
   }, [])
 
   useEffect(() => {
