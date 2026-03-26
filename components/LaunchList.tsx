@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useReadContract } from 'wagmi'
 import { createPublicClient, http, parseAbi } from 'viem'
 import { ContributeModal } from './ContributeModal'
@@ -51,6 +51,12 @@ export function LaunchList() {
   const [launches, setLaunches] = useState<Launch[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedLaunch, setSelectedLaunch] = useState<Launch | null>(null)
+
+  // Wrap callbacks with useCallback to prevent re-creation on each render
+  const handleCloseModal = useCallback(() => setSelectedLaunch(null), [])
+  const handleSuccessModal = useCallback(() => {
+    window.location.reload()
+  }, [])
 
   useEffect(() => {
     if (!totalCount || loadingCount) return
@@ -182,8 +188,8 @@ export function LaunchList() {
         <ContributeModal
           launchId={selectedLaunch.id}
           agentAddress={selectedLaunch.agent}
-          onClose={() => setSelectedLaunch(null)}
-          onSuccess={() => window.location.reload()}
+          onClose={handleCloseModal}
+          onSuccess={handleSuccessModal}
         />
       )}
     </div>

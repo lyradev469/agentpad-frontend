@@ -9,7 +9,7 @@ import { DEXSwapModal } from '@/components/DEXSwapModal'
 import { MPPPayment } from '@/components/MPPPayment'
 import HealthMonitor from '@/components/HealthMonitor'
 import { useAccount } from 'wagmi'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 export default function Home() {
   const { isConnected, address } = useAccount()
@@ -17,6 +17,12 @@ export default function Home() {
   const [showSponsorship, setShowSponsorship] = useState(false)
   const [showSwap, setShowSwap] = useState(false)
   const [swapData, setSwapData] = useState<any>(null)
+
+  // Wrap callbacks to prevent unnecessary re-renders
+  const handleCloseSponsorship = useCallback(() => setShowSponsorship(false), [])
+  const handleSuccessSponsorship = useCallback(() => setShowSponsorship(false), [])
+  const handleCloseSwap = useCallback(() => setShowSwap(false), [])
+  const handleSuccessSwap = useCallback(() => setShowSwap(false), [])
 
   useEffect(() => {
     if (isConnected && address) {
@@ -142,8 +148,8 @@ export default function Home() {
             fromToken={swapData.from}
             toToken={swapData.to}
             amount={swapData.amount}
-            onClose={() => setShowSwap(false)}
-            onSuccess={() => setShowSwap(false)}
+            onClose={handleCloseSwap}
+            onSuccess={handleSuccessSwap}
           />
         )}
 
