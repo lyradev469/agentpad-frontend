@@ -8,6 +8,7 @@ import { RegisterAgent } from '@/components/RegisterAgent'
 import { FeeSponsorshipPanel } from '@/components/FeeSponsorshipPanel'
 import { DEXSwapModal } from '@/components/DEXSwapModal'
 import { MPPPayment } from '@/components/MPPPayment'
+import { LaunchStats } from '@/components/LaunchStats'
 import HealthMonitor from '@/components/HealthMonitor'
 import { useAccount } from 'wagmi'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -106,6 +107,9 @@ export default function Home() {
 
       <div className="container-simple px-6 md:px-12 py-12">
         <WalletConnect />
+
+        {/* LIVE STATS BAR - NEW! */}
+        <LaunchStats />
 
         {/* Fee Sponsorship */}
         <AnimatePresence>
