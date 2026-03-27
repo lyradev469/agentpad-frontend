@@ -1,40 +1,60 @@
 import { http, createConfig } from 'wagmi'
-import { mainnet, base } from 'wagmi/chains'
+import { mainnet, base, tempo, tempoModerato } from 'wagmi/chains'
 import { coinbaseWallet, injected, metaMask, walletConnect } from 'wagmi/connectors'
+import { KeyManager, webAuthn } from 'wagmi/tempo'
 
-// Tempo chains configuration
-const tempoTestnet = {
-  id: 42431,
-  name: 'Tempo Testnet (Moderato)',
-  nativeCurrency: { name: 'USD', symbol: 'USD', decimals: 18 },
-  rpcUrls: {
-    default: { http: ['https://rpc.moderato.tempo.xyz'] },
-    public: { http: ['https://rpc.moderato.tempo.xyz'] },
-  },
-  blockExplorers: {
-    default: { name: 'Tempo Explorer', url: 'https://explore.tempo.xyz' },
-  },
-}
+/**
+ * Wagmi Configuration for AgentPad
+ * 
+ * Supports:
+ * 1. Passkey Authentication (WebAuthn) - Primary for Tempo
+ * 2.Injected Wallets (MetaMask, Coinbase) - Fallback
+ * 3. WalletConnect - For mobile/hardware wallets
+ * 
+ * Chains:
+ * - Tempo Moderate (Testnet) - Default for development
+ * - Tempo (Mainnet) - For production
+ * - Base - For future multi-chain support
+ * - Mainnet - For future multi-chain support
+ */
 
 export const config = createConfig({
-  chains: [tempoTestnet, base, mainnet],
+  chains: [tempoModerato, tempo, base, mainnet],
   connectors: [
+    // Primary: Passkey Authentication (WebAuthn) for Tempo
+    webAuthn({
+      keyManager: KeyManager.localStorage(),
+      // For production, use:
+      // keyManager: KeyManager.http({ baseUrl: process.env.NEXT_PUBLIC_KEY_MANAGER_URL! }),
+    }),
+
+    // Secondary: Standard Wallet Connectors
     injected({ target: 'metaMask' }),
     walletConnect({ 
       projectId: '85be66e6169307dc900bc2337d69d10a'
     }),
     metaMask(),
-    coinbaseWallet(),
+    coinbaseWallet({
+      appName: 'AgentPad',
+      appLogoUrl: 'https://agentpad.vercel.app/logo.png',
+    }),
   ],
   transports: {
-    [tempoTestnet.id]: http('https://rpc.moderato.tempo.xyz'),
+    [tempoModerato.id]: http('https://rpc.moderato.tempo.xyz'),
+    [tempo.id]: http('https://rpc.tempo.xyz'),
     [base.id]: http(),
     [mainnet.id]: http(),
   },
+
+  // Enable multi-injected provider discovery for wallet fallbacks
+  multiInjectedProviderDiscovery: true,
 })
 
+// Type declaration for wagmi module augmentation
 declare module 'wagmi' {
   interface Register {
     config: typeof config
   }
 }
+
+export default config

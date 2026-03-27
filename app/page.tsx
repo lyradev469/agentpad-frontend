@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { WalletConnect } from '@/components/WalletConnect'
+import { PasskeyAuth } from '@/components/PasskeyAuth'
 import { LaunchList } from '@/components/LaunchList'
 import { CreateLaunch } from '@/components/CreateLaunch'
 import { RegisterAgent } from '@/components/RegisterAgent'
@@ -12,7 +13,7 @@ import { LaunchStats } from '@/components/LaunchStats'
 import HealthMonitor from '@/components/HealthMonitor'
 import { useAccount } from 'wagmi'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Zap, Shield, DollarSign, ArrowUpRight, TrendingUp, Rocket } from 'lucide-react'
+import { Zap, Shield, DollarSign, ArrowUpRight, TrendingUp, Rocket, Key } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -106,7 +107,19 @@ export default function Home() {
       </header>
 
       <div className="container-simple px-6 md:px-12 py-12">
-        <WalletConnect />
+        <div className="grid md:grid-cols-2 gap-8 mb-8">
+          <WalletConnect />
+          <div>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              Passkey Authentication
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Sign in securely with biometrics. No passwords, no gas fees.
+            </p>
+            <PasskeyAuth />
+          </div>
+        </div>
 
         {/* LIVE STATS BAR - NEW! */}
         <LaunchStats />
