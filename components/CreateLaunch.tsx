@@ -7,13 +7,11 @@ import { validateSponsorshipEligibility, generateSponsorshipNonce } from '@/lib/
 
 const AGENT_PAD_ADDRESS = '0xd5291AB2181dcD04CEF3039dA52ec4880aC642D4' as const
 
-// TIP-20 Token addresses on Tempo (Mainnet & Testnet)
-// Source: https://docs.tempo.xyz/quickstart/predeployed-contracts
 const TIP20_TOKENS = {
-  pathUSD: '0x20c0000000000000000000000000000000000000', // Predeployed stablecoin
-  alphaUSD: '0x20c0000000000000000000000000000000000001', // Alpha stablecoin
-  betaUSD: '0x20c0000000000000000000000000000000000002', // Beta stablecoin
-  thetaUSD: '0x20c0000000000000000000000000000000000003', // Theta stablecoin
+  pathUSD: '0x20c0000000000000000000000000000000000000',
+  alphaUSD: '0x20c0000000000000000000000000000000000001',
+  betaUSD: '0x20c0000000000000000000000000000000000002',
+  thetaUSD: '0x20c0000000000000000000000000000000000003',
 }
 
 const abi = parseAbi([
@@ -44,24 +42,19 @@ export function CreateLaunch() {
     }
 
     try {
-      // Step 1: Validate fee sponsorship if enabled
       if (enableSponsorship) {
         setSponsorshipStatus('validating')
-        const { eligible, reason } = await validateSponsorshipEligibility(address, address)
+        const { eligible } = await validateSponsorshipEligibility(address, address)
         
         if (eligible) {
           setSponsorshipStatus('enabled')
-          // Generate nonce for sponsored transactions
           const nonce = await generateSponsorshipNonce(address)
           console.log('Fee sponsorship enabled, nonce:', nonce)
         } else {
-          console.warn('Sponsorship not available:', reason)
           setSponsorshipStatus('disabled')
         }
       }
 
-      // Step 2: Create launch with batch operations (approve + create in one TX if possible)
-      // For now, using standard createLaunch
       await writeContract({
         address: AGENT_PAD_ADDRESS,
         abi,
@@ -76,7 +69,6 @@ export function CreateLaunch() {
         ],
       })
 
-      // Success handling
       setTimeout(() => {
         setTarget('')
         setMin('')
@@ -113,150 +105,243 @@ export function CreateLaunch() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
         <div className="bg-red-50 border border-red-200 rounded p-3 text-red-700 text-sm">
           Error: {error instanceof Error ? error.message : 'Unknown error'}
         </div>
       )}
 
+      {/* Token Selection with Help - IMPROVED */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          TIP-20 Token
-        </label>
-        <select
-          value={token}
-          onChange={(e) => setToken(e.target.value as 'pathUSD' | 'alphaUSD' | 'betaUSD' | 'thetaUSD')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="pathUSD">pathUSD (Primary)</option>
-          <option value="alphaUSD">alphaUSD</option>
-          <option value="betaUSD">betaUSD</option>
-          <option value="thetaUSD">thetaUSD</option>
-        </select>
-        <p className="text-xs text-gray-500 mt-1">
-          Select the stablecoin for this launch
-        </p>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-bold text-gray-900">
+            Select Stablecoin
+            <span className="ml-2 text-xs font-normal text-gray-500">(TIP-20)</span>
+          </label>
+        </div>
+        
+        <div className="relative">
+          <select
+            value={token}
+            onChange={(e) => setToken(e.target.value as 'pathUSD' | 'alphaUSD' | 'betaUSD' | 'thetaUSD')}
+            className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors font-medium text-gray-900"
+          >
+            <option value="pathUSD">pathUSD (Primary - Deepest Liquidity)</option>
+            <option value="alphaUSD">alphaUSD (Testnet)</option>
+            <option value="betaUSD">betaUSD (Testnet)</option>
+            <option value="thetaUSD">thetaUSD (Testnet)</option>
+          </select>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-50">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+        
+        {/* Help Text Box - NEW */}
+        <div className="mt-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="flex items-start gap-3">
+            <span className="text-lg">💡</span>
+            <div>
+              <p className="text-sm font-semibold text-amber-900 mb-1">Why pathUSD?</p>
+              <p className="text-xs text-amber-800 leading-relaxed">
+                Primary stablecoin on Tempo with the deepest liquidity pools. Used as base pair in enshrined DEX.
+                Best choice for maximum visibility and trader trust. Testnet tokens (alpha/beta/theta) are for development only.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* Target Amount with Info - IMPROVED */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Target Amount (tokens)
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-bold text-gray-900">
+            Target Amount
+          </label>
+          <span className="text-xs text-gray-500">Recommended: $1K - $100K</span>
+        </div>
         <input
           type="number"
           step="0.01"
           required
           value={target}
           onChange={(e) => setTarget(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors font-mono text-gray-900"
           placeholder="10000"
         />
+        <p className="text-xs text-gray-600 mt-2">
+          Total {token} you want to raise from contributors
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Min Contribution
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            required
-            value={min}
-            onChange={(e) => setMin(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="10"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Max Contribution
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            required
-            value={max}
-            onChange={(e) => setMax(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="1000"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Duration (days)
-          </label>
-          <input
-            type="number"
-            required
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="7"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Vesting (days)
-          </label>
-          <input
-            type="number"
-            required
-            value={vesting}
-            onChange={(e) => setVesting(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="30"
-          />
+      {/* Contribution Limits with Tooltips - IMPROVED */}
+      <div>
+        <label className="block text-sm font-bold text-gray-900 mb-3">
+          Contribution Limits
+        </label>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <label className="text-xs font-semibold text-gray-700">Minimum</label>
+              <div className="group relative cursor-help">
+                <span className="w-4 h-4 bg-gray-200 rounded-full flex items-center justify-center text-xs">?</span>
+                <div className="absolute right-0 bottom-8 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block z-10">
+                  <p className="text-xs text-gray-700">
+                    Too low (&lt;$10) = many small TXs. Recommended: $10-$50 for balanced gas efficiency.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <input
+              type="number"
+              step="0.01"
+              required
+              value={min}
+              onChange={(e) => setMin(e.target.value)}
+              className="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors font-mono text-sm"
+              placeholder="10"
+            />
+            <p className="text-xs text-gray-500 mt-1">{token} per contributor</p>
+          </div>
+          
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <label className="text-xs font-semibold text-gray-700">Maximum</label>
+              <div className="group relative cursor-help">
+                <span className="w-4 h-4 bg-gray-200 rounded-full flex items-center justify-center text-xs">?</span>
+                <div className="absolute right-0 bottom-8 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block z-10">
+                  <p className="text-xs text-gray-700">
+                    Prevent whale dominance. Recommended: 5-10% of target to ensure community distribution.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <input
+              type="number"
+              step="0.01"
+              required
+              value={max}
+              onChange={(e) => setMax(e.target.value)}
+              className="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors font-mono text-sm"
+              placeholder="1000"
+            />
+            <p className="text-xs text-gray-500 mt-1">{token} per contributor</p>
+          </div>
         </div>
       </div>
 
-      {/* Fee Sponsorship Toggle */}
+      {/* Duration & Vesting - IMPROVED */}
+      <div>
+        <label className="block text-sm font-bold text-gray-900 mb-3">
+          Timeline
+        </label>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <label className="text-xs font-semibold text-gray-700">Duration</label>
+              <div className="group relative cursor-help">
+                <span className="w-4 h-4 bg-gray-200 rounded-full flex items-center justify-center text-xs">?</span>
+                <div className="absolute right-0 bottom-8 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block z-10">
+                  <p className="text-xs text-gray-700">
+                    3-7 days for quick raises. 14-30 days for marketing-heavy campaigns. Tempo finality: ~500ms.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <input
+              type="number"
+              required
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              className="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors font-mono text-sm"
+              placeholder="7"
+            />
+            <p className="text-xs text-gray-500 mt-1">Days to raise funds</p>
+          </div>
+          
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <label className="text-xs font-semibold text-gray-700">Vesting</label>
+              <div className="group relative cursor-help">
+                <span className="w-4 h-4 bg-gray-200 rounded-full flex items-center justify-center text-xs">?</span>
+                <div className="absolute right-0 bottom-8 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block z-10">
+                  <p className="text-xs text-gray-700">
+                    Prevent immediate dumps. 30-90 days recommended. Built-in on Tempo protocol (no extra contract).
+                  </p>
+                </div>
+              </div>
+            </div>
+            <input
+              type="number"
+              required
+              value={vesting}
+              onChange={(e) => setVesting(e.target.value)}
+              className="w-full px-3 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors font-mono text-sm"
+              placeholder="30"
+            />
+            <p className="text-xs text-gray-500 mt-1">Days to unlock tokens</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Fee Sponsorship Toggle - IMPROVED */}
       {isConnected && address && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
           <div className="flex items-start justify-between">
-            <div>
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={enableSponsorship}
-                  onChange={(e) => setEnableSponsorship(e.target.checked)}
-                  className="mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-blue-900">
-                  Enable Fee Sponsorship for Contributors
-                </span>
-              </label>
-              <p className="text-xs text-blue-700 mt-1 ml-7">
-                Tempo will automatically cover gas fees for all contributors
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
+                <span className="text-white text-xs">✓</span>
+              </div>
+              <div>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={enableSponsorship}
+                    onChange={(e) => setEnableSponsorship(e.target.checked)}
+                    className="mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-semibold text-blue-900">
+                    Enable Zero Gas for Contributors
+                  </span>
+                </label>
+                <p className="text-xs text-blue-700 mt-1 ml-8">
+                  Tempo Fee Sponsorship pays all gas fees. Contributors only need stablecoins!
+                </p>
+              </div>
             </div>
             {sponsorshipStatus === 'validating' && (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
             )}
             {sponsorshipStatus === 'enabled' && (
-              <span className="text-green-600 text-sm">✓ Enabled</span>
-            )}
-            {sponsorshipStatus === 'disabled' && (
-              <span className="text-gray-500 text-sm">Not available</span>
+              <span className="text-green-600 text-sm font-medium">✓ Active</span>
             )}
           </div>
         </div>
       )}
 
+      {/* Submit Button */}
       <button
         type="submit"
         disabled={isPending || !target || !min || !max || !duration || !vesting}
-        className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-black text-white py-4 rounded-lg font-bold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed text-lg"
       >
-        {isPending ? 'Creating Launch...' : 'Create Token Launch'}
+        {isPending ? (
+          <span className="flex items-center justify-center gap-2">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+            Creating Launch...
+          </span>
+        ) : (
+          '🚀 Launch Token'
+        )}
       </button>
 
-      <p className="text-xs text-gray-500 text-center mt-3">
-        Tempo handles gas fees automatically via fee sponsorship. No gas needed!
+      <p className="text-xs text-gray-500 text-center mt-3 flex items-center justify-center gap-1">
+        <span className="text-green-600">⚡</span>
+        All transactions on Tempo: ~500ms finality, zero gas fees
       </p>
     </form>
   )
