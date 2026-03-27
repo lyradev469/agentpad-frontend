@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useWriteContract, useAccount } from 'wagmi'
 import { parseAbi } from 'viem'
+import { validateSponsorshipEligibility, generateSponsorshipNonce } from '@/lib/feePayer'
 
 const AGENT_PAD_ADDRESS = '0xd5291AB2181dcD04CEF3039dA52ec4880aC642D4' as const
 
@@ -29,6 +30,8 @@ export function CreateLaunch() {
   const [max, setMax] = useState('')
   const [duration, setDuration] = useState('7')
   const [vesting, setVesting] = useState('30')
+  const [enableSponsorship, setEnableSponsorship] = useState(true)
+  const [sponsorshipStatus, setSponsorshipStatus] = useState<'idle' | 'validating' | 'enabled' | 'disabled'>('idle')
 
   const selectedTokenAddress: `0x${string}` = TIP20_TOKENS[token] as `0x${string}`
 
@@ -41,7 +44,25 @@ export function CreateLaunch() {
     }
 
     try {
-      writeContract({
+      // Step 1: Validate fee sponsorship if enabled
+      if (enableSponsorship) {
+        setSponsorshipStatus('validating')
+        const { eligible, reason } = await validateSponsorshipEligibility(address, address)
+        
+        if (eligible) {
+          setSponsorshipStatus('enabled')
+          // Generate nonce for sponsored transactions
+          const nonce = await generateSponsorshipNonce(address)
+          console.log('Fee sponsorship enabled, nonce:', nonce)
+        } else {
+          console.warn('Sponsorship not available:', reason)
+          setSponsorshipStatus('disabled')
+        }
+      }
+
+      // Step 2: Create launch with batch operations (approve + create in one TX if possible)
+      // For now, using standard createLaunch
+      await writeContract({
         address: AGENT_PAD_ADDRESS,
         abi,
         functionName: 'createLaunch',
@@ -54,8 +75,17 @@ export function CreateLaunch() {
           BigInt(parseInt(duration) * 24 * 60 * 60),
         ],
       })
+
+      // Success handling
+      setTimeout(() => {
+        setTarget('')
+        setMin('')
+        setMax('')
+        setSponsorshipStatus('idle')
+      }, 2000)
     } catch (err) {
       console.error('Failed to create launch:', err)
+      setSponsorshipStatus('idle')
       const errorMessage = err instanceof Error ? err.message : 'Unknown error'
       alert(`Failed to create launch: ${errorMessage}`)
     }
@@ -184,16 +214,49 @@ export function CreateLaunch() {
         </div>
       </div>
 
+      {/* Fee Sponsorship Toggle */}
+      {isConnected && address && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={enableSponsorship}
+                  onChange={(e) => setEnableSponsorship(e.target.checked)}
+                  className="mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-blue-900">
+                  Enable Fee Sponsorship for Contributors
+                </span>
+              </label>
+              <p className="text-xs text-blue-700 mt-1 ml-7">
+                Tempo will automatically cover gas fees for all contributors
+              </p>
+            </div>
+            {sponsorshipStatus === 'validating' && (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
+            )}
+            {sponsorshipStatus === 'enabled' && (
+              <span className="text-green-600 text-sm">✓ Enabled</span>
+            )}
+            {sponsorshipStatus === 'disabled' && (
+              <span className="text-gray-500 text-sm">Not available</span>
+            )}
+          </div>
+        </div>
+      )}
+
       <button
         type="submit"
-        disabled={isPending || !isConnected}
-        className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={isPending || !target || !min || !max || !duration || !vesting}
+        className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isPending ? 'Creating Launch...' : !isConnected ? 'Connect Wallet First' : 'Create Launch'}
+        {isPending ? 'Creating Launch...' : 'Create Token Launch'}
       </button>
 
-      <p className="text-xs text-gray-500 text-center">
-        Tempo handles gas fees automatically. You don't pay for transactions!
+      <p className="text-xs text-gray-500 text-center mt-3">
+        Tempo handles gas fees automatically via fee sponsorship. No gas needed!
       </p>
     </form>
   )
