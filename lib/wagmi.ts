@@ -8,8 +8,9 @@ import { KeyManager, webAuthn } from 'wagmi/tempo'
  * 
  * Supports:
  * 1. Passkey Authentication (WebAuthn) - Primary for Tempo
- * 2.Injected Wallets (MetaMask, Coinbase) - Fallback
- * 3. WalletConnect - For mobile/hardware wallets
+ *    - Dev Mode: LocalStorage (no backend needed)
+ *    - Production: Remote Key Manager (cross-device sync)
+ * 2. Standard Wallets - Fallback options
  * 
  * Chains:
  * - Tempo Moderate (Testnet) - Default for development
@@ -18,20 +19,35 @@ import { KeyManager, webAuthn } from 'wagmi/tempo'
  * - Mainnet - For future multi-chain support
  */
 
+// Environment detection
+const isDevelopment = process.env.NODE_ENV === 'development'
+const keyManagerUrl = process.env.NEXT_PUBLIC_KEY_MANAGER_URL
+const keyManagerApiKey = process.env.NEXT_PUBLIC_KEY_MANAGER_API_KEY
+
+// Configure WebAuthn connector based on environment
+const webAuthnConnector = webAuthn({
+  keyManager: keyManagerUrl && !isDevelopment
+    ? KeyManager.http({
+        baseUrl: keyManagerUrl,
+        fetchOptions: {
+          headers: {
+            'X-API-Key': keyManagerApiKey!,
+          },
+        },
+      })
+    : KeyManager.localStorage(), // Dev fallback
+})
+
 export const config = createConfig({
   chains: [tempoModerato, tempo, base, mainnet],
   connectors: [
     // Primary: Passkey Authentication (WebAuthn) for Tempo
-    webAuthn({
-      keyManager: KeyManager.localStorage(),
-      // For production, use:
-      // keyManager: KeyManager.http({ baseUrl: process.env.NEXT_PUBLIC_KEY_MANAGER_URL! }),
-    }),
+    webAuthnConnector,
 
     // Secondary: Standard Wallet Connectors
     injected({ target: 'metaMask' }),
     walletConnect({ 
-      projectId: '85be66e6169307dc900bc2337d69d10a'
+      projectId: keyManagerApiKey || '85be66e6169307dc900bc2337d69d10a' // Use WalletConnect ID if no API key
     }),
     metaMask(),
     coinbaseWallet({
@@ -55,6 +71,17 @@ declare module 'wagmi' {
   interface Register {
     config: typeof config
   }
+}
+
+/**
+ * Helper: Get active key manager type
+ * Useful for logging/debugging
+ */
+export function getKeyManagerType(): 'remote' | 'local' {
+  if (keyManagerUrl && !isDevelopment) {
+    return 'remote'
+  }
+  return 'local'
 }
 
 export default config
